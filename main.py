@@ -1,6 +1,4 @@
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
 
 # layers we need, we can add more later if needed
 from tensorflow.keras.models import Sequential
@@ -8,14 +6,11 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import BatchNormalization, Dropout
 from tensorflow.keras.layers import Flatten, Dense
 
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
 # remap labels to 0-14
 from sklearn.preprocessing import LabelEncoder
 
 import numpy as np
 import random
-import os
 import pickle
 from pathlib import Path
 
