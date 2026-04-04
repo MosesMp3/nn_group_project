@@ -59,9 +59,8 @@ le = LabelEncoder()
 y_train = le.fit_transform(y_train)
 y_val = le.transform(y_val)
 
-# rescaling data from large numbers to numberss from 0 to 1
-X_train = X_train.astype("float32") / 255.0
-X_val   = X_val.astype("float32")   / 255.0
+X_train = X_train.astype("float32")
+X_val   = X_val.astype("float32")
 
 print(f"Image shape: {X_train[0].shape}")
 print(f"Pixel range: {X_train.min()} - {X_train.max()}")
