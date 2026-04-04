@@ -60,6 +60,8 @@ y_train = np.array(y_train)
 X_val = np.array(X_val)
 y_val = np.array(y_val)
 
+print(f"Pixel range: {X_train.min()} - {X_train.max()}")
+
 # rescaling data from large numbers to numberss from 0 to 1
 X_train = X_train.astype("float32") / 255.0
 X_val   = X_val.astype("float32")   / 255.0
