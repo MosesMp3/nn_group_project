@@ -35,3 +35,11 @@ class moses_model:
             Dense(15, activation="softmax")
         ])
         return model
+    
+    def load(self, weights_path="model.pth"):
+        self.model.load_weights(weights_path)
+
+    def predict(self, images):
+        images = np.array(images).astype("float32")
+        predictions = self.model.predict(images)
+        return np.argmax(predictions, axis=1)
