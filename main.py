@@ -1,10 +1,13 @@
 import tensorflow as tf
+
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.preprocessing import LabelEncoder
+
 import numpy as np
 import random
 import pickle
+
 from pathlib import Path
 
 from model import moses_model
@@ -63,7 +66,7 @@ history = model.fit(
     datagen.flow(X_train, y_train, batch_size=32),
     validation_data=(X_val, y_val),
     epochs=100,
-    callbacks=[early_stop, reduce_lr]
+    callbacks=[early_stop]
 )
 
 # save weights
