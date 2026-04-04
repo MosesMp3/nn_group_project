@@ -77,16 +77,21 @@ input_shape = (64, 64, 3)
 num_classes = 15
 
 model = Sequential([
-    Conv2D(6, (5, 5), activation="relu", padding="same", input_shape=input_shape),
-    tf.keras.layers.AveragePooling2D(2, 2),
+    Conv2D(32, (3, 3), activation="relu", padding="same", input_shape=input_shape),
+    BatchNormalization(),
+    MaxPooling2D(2, 2),
 
-    Conv2D(6, (5, 5), activation="relu", padding="valid"),
-    tf.keras.layers.AveragePooling2D(2, 2),
+    Conv2D(64, (3, 3), activation="relu", padding="valid"),
+    BatchNormalization(),
+    MaxPooling2D(2, 2),
+
+    Conv2D(64, (3, 3), activation="relu", padding="valid"),
+    BatchNormalization(),
+    MaxPooling2D(2, 2),
 
     Flatten(),
-    Dense(120, activation="relu"),
+    Dense(256, activation="relu"),
     Dropout(0.5),
-    Dense(84, activation="relu"),
     Dense(num_classes, activation="softmax")
 ])
 
