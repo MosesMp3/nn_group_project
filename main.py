@@ -1,7 +1,6 @@
 import tensorflow as tf
 
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import LabelEncoder
 
 import numpy as np
@@ -63,7 +62,7 @@ early_stop = EarlyStopping(
 
 # train
 history = model.fit(
-    datagen.flow(X_train, y_train, batch_size=32),
+    X_train, y_train,  
     validation_data=(X_val, y_val),
     epochs=100,
     callbacks=[early_stop]
