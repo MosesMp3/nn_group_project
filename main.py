@@ -42,12 +42,6 @@ with open(val_path, "rb") as f:
 print("Train keys:", train_data.keys())
 print("Val keys:", val_data.keys())
 
-# remap labels from 0-14 pt. 2 > currently random ints such as 163, 28, 6, 189, etc.
-le = LabelEncoder()
-y_train = le.fit_transform(y_train)
-y_val = le.transform(y_val)
-
-
 X_train = train_data["images"]
 y_train = train_data["labels"]
 X_val = val_data["images"]
@@ -60,7 +54,10 @@ y_train = np.array(y_train)
 X_val = np.array(X_val)
 y_val = np.array(y_val)
 
-print(f"Pixel range: {X_train.min()} - {X_train.max()}")
+# remap labels from 0-14 pt. 2 > currently random ints such as 163, 28, 6, 189, etc.
+le = LabelEncoder()
+y_train = le.fit_transform(y_train)
+y_val = le.transform(y_val)
 
 # rescaling data from large numbers to numberss from 0 to 1
 X_train = X_train.astype("float32") / 255.0
