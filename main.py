@@ -77,17 +77,21 @@ input_shape = (64, 64, 3)
 num_classes = 15
 
 model = Sequential([
-    Conv2D(32, (3, 3), activation="relu", padding="same", input_shape=input_shape),
+    Conv2D(64, (3, 3), activation="relu", padding="same", input_shape=input_shape),
     BatchNormalization(),
     MaxPooling2D(2, 2),
     Dropout(0.25),
 
-    Conv2D(64, (3, 3), activation="relu", padding="valid"),
+    Conv2D(128, (3, 3), activation="relu", padding="valid"),
     BatchNormalization(),
     MaxPooling2D(2, 2),
     Dropout(0.25),
 
-    Conv2D(64, (3, 3), activation="relu", padding="valid"),
+    Conv2D(256, (3, 3), activation="relu", padding="valid"),
+    BatchNormalization(),
+    MaxPooling2D(2, 2),
+
+    Conv2D(512, (3, 3), activation="relu", padding="valid"),
     BatchNormalization(),
     MaxPooling2D(2, 2),
 
@@ -98,17 +102,25 @@ model = Sequential([
 ])
 
 model.compile(
-    optimizer="adam",
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
     loss="sparse_categorical_crossentropy",
     metrics=["accuracy"]
 )
 
+# early stopping to prevent overfitting
+early_stop = tf.keras.callbacks.EarlyStopping ( 
+    monitor="val_accuracy",
+    patience=3,
+    restore_best_weights=True
+)
+
 model.summary()
 
-# --- TRAIN ---
+# training
 history = model.fit(
     X_train, y_train,
     validation_data=(X_val, y_val),
-    epochs=50,
-    batch_size=32
+    epochs=25,
+    batch_size=32,
+    callbacks=early_stop
 )
