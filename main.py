@@ -72,3 +72,36 @@ print(f"Validation data shape: {X_val.shape}")
 print(f"Validation labels shape: {y_val.shape}")
 print(f"Class names: {class_names}")
 print(f"Number of classes: {len(class_names)}")
+
+input_shape = (64, 64, 3)
+num_classes = 15
+
+model = Sequential([
+    Conv2D(6, (5, 5), activation="relu", padding="same", input_shape=input_shape),
+    tf.keras.layers.AveragePooling2D(2, 2),
+
+    Conv2D(6, (5, 5), activation="relu", padding="valid"),
+    tf.keras.layers.AveragePooling2D(2, 2),
+
+    Flatten(),
+    Dense(120, activation="relu"),
+    Dropout(0.5),
+    Dense(84, activation="relu"),
+    Dense(num_classes, activation="softmax")
+])
+
+model.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+model.summary()
+
+# --- TRAIN ---
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=20,
+    batch_size=32
+)
