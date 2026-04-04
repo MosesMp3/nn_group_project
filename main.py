@@ -80,10 +80,12 @@ model = Sequential([
     Conv2D(32, (3, 3), activation="relu", padding="same", input_shape=input_shape),
     BatchNormalization(),
     MaxPooling2D(2, 2),
+    Dropout(0.25),
 
     Conv2D(64, (3, 3), activation="relu", padding="valid"),
     BatchNormalization(),
     MaxPooling2D(2, 2),
+    Dropout(0.25),
 
     Conv2D(64, (3, 3), activation="relu", padding="valid"),
     BatchNormalization(),
@@ -107,6 +109,6 @@ model.summary()
 history = model.fit(
     X_train, y_train,
     validation_data=(X_val, y_val),
-    epochs=20,
+    epochs=50,
     batch_size=32
 )
