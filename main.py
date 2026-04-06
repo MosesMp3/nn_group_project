@@ -28,9 +28,9 @@ with open(train_path, "rb") as f:
 with open(val_path, "rb") as f:
     val_data = pickle.load(f)
 
-X_train = np.array(train_data["images"]).astype("float32")
+X_train = np.array(train_data["images"]).astype("float32") / 255
 y_train = np.array(train_data["labels"])
-X_val = np.array(val_data["images"]).astype("float32")
+X_val = np.array(val_data["images"]).astype("float32") / 255
 y_val = np.array(val_data["labels"])
 
 le = LabelEncoder()
@@ -61,7 +61,7 @@ model.summary()
 # callbacks
 early_stop = EarlyStopping(
     monitor="val_accuracy",
-    patience=10,
+    patience=7,
     restore_best_weights=True
 )
 

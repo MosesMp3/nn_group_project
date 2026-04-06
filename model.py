@@ -2,7 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import BatchNormalization, Dropout
-from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.layers import Flatten, Dense, GlobalAveragePooling2D
+from tensorflow.keras.regularizers import l2
 import numpy as np
 
 class moses_model:
@@ -11,25 +12,28 @@ class moses_model:
 
     def _build_model(self):
         model = Sequential([
-            Conv2D(64,  (3,3), activation="relu", padding="same", input_shape=(64,64,3)),
+            #kernel_regularizer=12(0.001) > L2 regularization to each Conv2D
+            Conv2D(64,  (3,3), activation="relu", padding="same", kernel_regularizer=l2(0.001), input_shape=(64,64,3)),
             BatchNormalization(),
             MaxPooling2D(2,2),
-            Dropout(0.25),
+            Dropout(0.20),
 
-            Conv2D(128, (3,3), activation="relu", padding="same"),
+            Conv2D(128, (3,3), activation="relu", padding="same", kernel_regularizer=l2(0.001)),
             BatchNormalization(),
             MaxPooling2D(2,2),
             Dropout(0.3),
 
-            Conv2D(256, (3,3), activation="relu", padding="same"),
+            Conv2D(256, (3,3), activation="relu", padding="same", kernel_regularizer=l2(0.001)),
             BatchNormalization(),
             MaxPooling2D(2,2),
-            Dropout(0.35),
+            Dropout(0.4),
 
             #Conv2D(512, (3,3), activation="relu", padding="valid"),
             #BatchNormalization(),
             #MaxPooling2D(2,2),
 
+
+            #Flatten(),GlobalAveragePooling2D()
             Flatten(),
             Dense(256, activation="relu"),
             Dropout(0.5),
