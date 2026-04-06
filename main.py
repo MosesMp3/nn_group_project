@@ -42,6 +42,10 @@ le = LabelEncoder()
 y_train = le.fit_transform(y_train)
 y_val = le.transform(y_val)
 
+y_train = tf.keras.utils.to_categorical(y_train, 15)
+y_val = tf.keras.utils.to_categorical(y_val, 15)
+
+
 print(f"Image shape: {X_train[0].shape}")
 print(f"Pixel range: {X_train.min()} - {X_train.max()}")
 print(f"Training data shape: {X_train.shape}")
@@ -57,7 +61,8 @@ model = classifier.model
 # (learning_rate=0.0001)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),  # changed the rate
-    loss="sparse_categorical_crossentropy",
+    loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
+    # loss="sparse_categorical_crossentropy"
     metrics=["accuracy"],
 )
 
