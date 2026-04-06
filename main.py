@@ -64,11 +64,11 @@ classifier = moses_model()
 model = classifier.model
 
 # add back in when it works, remove when restarting
-# classifier.load("model.pth")
-
-
+classifier.load("model.pth")
+lr = 0.0001
+# if using classifier move learning rate from 0.001 which is for scratch to 0.0001
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),  # changed the rate
+    optimizer=tf.keras.optimizers.Adam(learning_rate=lr),  # changed the rate
     loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
     # loss="sparse_categorical_crossentropy"
     metrics=["accuracy"],
@@ -93,7 +93,7 @@ datagen = ImageDataGenerator(
 # learning rate adjustment
 #
 def cosine_schedule(epoch, lr):
-    return 0.001 * 0.5 * (1 + math.cos(math.pi * epoch / 200))
+    return lr * 0.5 * (1 + math.cos(math.pi * epoch / 200))
 
 
 cosine_lr = LearningRateScheduler(cosine_schedule)
@@ -105,6 +105,7 @@ checkpoint = ModelCheckpoint(
     save_best_only=True,
     save_weights_only=True,
 )
+
 
 # train
 datagen.fit(X_train)
@@ -121,3 +122,16 @@ print(f"Best model - Loss: {score[0]:.4f}, Accuracy: {score[1]:.4f}")
 
 model.save_weights("model.weights.h5")
 os.rename("model.weights.h5", "model.pth")
+
+
+classifier = moses_model()
+classifier.load("model.pth")
+
+predictions = classifier.predict(val_data["images"])
+
+
+le = LabelEncoder()
+y_true = le.fit_transform(val_data["labels"])
+
+accuracy = np.mean(predictions == y_true)
+print(f"Test accuracy: {accuracy:.4f}")

@@ -67,5 +67,7 @@ class moses_model:
 
     def predict(self, images):
         images = np.array(images).astype("float32")
+        if images.max() > 1.0:
+            images = images / 255.0
         predictions = self.model.predict(images)
         return np.argmax(predictions, axis=1)
