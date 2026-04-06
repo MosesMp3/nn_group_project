@@ -33,6 +33,11 @@ y_train = np.array(train_data["labels"])
 X_val = np.array(val_data["images"]).astype("float32")
 y_val = np.array(val_data["labels"])
 
+# norm
+X_train = X_train / 255.0
+X_val = X_val / 255.0
+
+
 le = LabelEncoder()
 y_train = le.fit_transform(y_train)
 y_val = le.transform(y_val)
@@ -46,23 +51,21 @@ print(f"Validation data shape: {X_val.shape}")
 classifier = moses_model()
 model = classifier.model
 
-#add back in when it works, remove when restarting
-#classifier.load("model.pth")
+# add back in when it works, remove when restarting
+# classifier.load("model.pth")
 
-#(learning_rate=0.0001)
+# (learning_rate=0.0001)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
     loss="sparse_categorical_crossentropy",
-    metrics=["accuracy"]
+    metrics=["accuracy"],
 )
 
 model.summary()
 
 # callbacks
 early_stop = EarlyStopping(
-    monitor="val_accuracy",
-    patience=10,
-    restore_best_weights=True
+    monitor="val_accuracy", patience=15, restore_best_weights=True
 )
 
 # augmentation
@@ -75,19 +78,15 @@ datagen = ImageDataGenerator(
 )
 
 # learning rate adjustment
-#reduce_lr = ReduceLROnPlateau(
-#    monitor="val_loss",
-#    factor=0.5,
-#    patience=5,
-#    min_lr=1e-6
-#)
+reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6)
 
 # train
+datagen.fit(X_train)
 history = model.fit(
-    X_train, y_train,
+    datagen.flow(X_train, y_train, batch_size=32),
     validation_data=(X_val, y_val),
     epochs=100,
-    callbacks=[early_stop]
+    callbacks=[early_stop, reduce_lr],
 )
 
 
@@ -95,5 +94,6 @@ history = model.fit(
 model.save_weights("model.weights.h5")
 
 import os
+
 os.rename("model.weights.h5", "model.pth")
 print("Weights saved to model.pth")
