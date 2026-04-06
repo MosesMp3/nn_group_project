@@ -3,6 +3,8 @@ import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import ModelCheckpoint
+
 
 import numpy as np
 import random
@@ -11,6 +13,12 @@ import pickle
 from pathlib import Path
 
 from model import moses_model
+import os
+
+
+from tensorflow.keras.callbacks import LearningRateScheduler
+import math
+
 
 SEED = 42
 tf.random.set_seed(SEED)
@@ -58,7 +66,7 @@ model = classifier.model
 # add back in when it works, remove when restarting
 # classifier.load("model.pth")
 
-# (learning_rate=0.0001)
+
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),  # changed the rate
     loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
@@ -67,7 +75,6 @@ model.compile(
 )
 
 model.summary()
-
 # callbacks
 early_stop = EarlyStopping(
     monitor="val_accuracy", patience=15, restore_best_weights=True
@@ -81,23 +88,36 @@ datagen = ImageDataGenerator(
     horizontal_flip=True,
     zoom_range=0.15,
 )
+
+
 # learning rate adjustment
+#
+def cosine_schedule(epoch, lr):
+    return 0.001 * 0.5 * (1 + math.cos(math.pi * epoch / 200))
+
+
+cosine_lr = LearningRateScheduler(cosine_schedule)
 reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6)
+
+checkpoint = ModelCheckpoint(
+    "best_model.weights.h5",
+    monitor="val_accuracy",
+    save_best_only=True,
+    save_weights_only=True,
+)
 
 # train
 datagen.fit(X_train)
 history = model.fit(
-    datagen.flow(X_train, y_train, batch_size=32),
+    datagen.flow(X_train, y_train, batch_size=64),
     validation_data=(X_val, y_val),
-    epochs=100,
-    callbacks=[early_stop, reduce_lr],
+    epochs=200,
+    callbacks=[early_stop, cosine_lr, checkpoint],
 )
 
+model.load_weights("best_model.weights.h5")
+score = model.evaluate(X_val, y_val)
+print(f"Best model - Loss: {score[0]:.4f}, Accuracy: {score[1]:.4f}")
 
-# save weights
 model.save_weights("model.weights.h5")
-
-import os
-
 os.rename("model.weights.h5", "model.pth")
-print("Weights saved to model.pth")

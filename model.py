@@ -13,29 +13,40 @@ class moses_model:
     def _build_model(self):
         model = Sequential(
             [
-                Conv2D(
-                    64,
-                    (3, 3),
-                    activation="relu",
-                    padding="same",
-                    input_shape=(64, 64, 3),
-                ),
+                # Block 1
+                Conv2D(64, (3, 3), padding="same", input_shape=(64, 64, 3)),
                 BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                Conv2D(64, (3, 3), padding="same"),
+                BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
                 MaxPooling2D(2, 2),
                 Dropout(0.25),
                 # Block 2
-                Conv2D(128, (3, 3), activation="relu", padding="same"),
+                Conv2D(128, (3, 3), padding="same"),
                 BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                Conv2D(128, (3, 3), padding="same"),
+                BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
                 MaxPooling2D(2, 2),
                 Dropout(0.3),
                 # Block 3
-                Conv2D(256, (3, 3), activation="relu", padding="same"),
+                Conv2D(256, (3, 3), padding="same"),
                 BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                Conv2D(256, (3, 3), padding="same"),
+                BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
                 MaxPooling2D(2, 2),
                 Dropout(0.35),
                 # Block 4
-                Conv2D(512, (3, 3), activation="relu", padding="same"),
+                Conv2D(512, (3, 3), padding="same"),
                 BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
+                Conv2D(512, (3, 3), padding="same"),
+                BatchNormalization(),
+                tf.keras.layers.Activation("relu"),
                 Dropout(0.4),
                 # Classification head
                 GlobalAveragePooling2D(),
@@ -58,4 +69,3 @@ class moses_model:
         images = np.array(images).astype("float32")
         predictions = self.model.predict(images)
         return np.argmax(predictions, axis=1)
-
