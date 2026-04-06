@@ -1,7 +1,8 @@
 import tensorflow as tf
 
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import numpy as np
 import random
@@ -45,6 +46,10 @@ print(f"Validation data shape: {X_val.shape}")
 classifier = moses_model()
 model = classifier.model
 
+#add back in when it works, remove when restarting
+#classifier.load("model.pth")
+
+#(learning_rate=0.0001)
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
     loss="sparse_categorical_crossentropy",
@@ -56,18 +61,39 @@ model.summary()
 # callbacks
 early_stop = EarlyStopping(
     monitor="val_accuracy",
-    patience=5,
+    patience=10,
     restore_best_weights=True
 )
 
+# augmentation
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.15,
+    height_shift_range=0.15,
+    horizontal_flip=True,
+    zoom_range=0.15,
+)
+
+# learning rate adjustment
+#reduce_lr = ReduceLROnPlateau(
+#    monitor="val_loss",
+#    factor=0.5,
+#    patience=5,
+#    min_lr=1e-6
+#)
+
 # train
 history = model.fit(
-    X_train, y_train,  
+    X_train, y_train,
     validation_data=(X_val, y_val),
     epochs=100,
     callbacks=[early_stop]
 )
 
+
 # save weights
-model.save_weights("model.pth")
+model.save_weights("model.weights.h5")
+
+import os
+os.rename("model.weights.h5", "model.pth")
 print("Weights saved to model.pth")

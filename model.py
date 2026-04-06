@@ -11,23 +11,24 @@ class moses_model:
 
     def _build_model(self):
         model = Sequential([
-            Conv2D(64, (3,3), activation="relu", padding="same", input_shape=(64,64,3)),
+            Conv2D(64,  (3,3), activation="relu", padding="same", input_shape=(64,64,3)),
             BatchNormalization(),
             MaxPooling2D(2,2),
             Dropout(0.25),
 
-            Conv2D(128, (3,3), activation="relu", padding="valid"),
+            Conv2D(128, (3,3), activation="relu", padding="same"),
             BatchNormalization(),
             MaxPooling2D(2,2),
-            Dropout(0.25),
+            Dropout(0.3),
 
-            Conv2D(256, (3,3), activation="relu", padding="valid"),
+            Conv2D(256, (3,3), activation="relu", padding="same"),
             BatchNormalization(),
             MaxPooling2D(2,2),
+            Dropout(0.35),
 
-            Conv2D(512, (3,3), activation="relu", padding="valid"),
-            BatchNormalization(),
-            MaxPooling2D(2,2),
+            #Conv2D(512, (3,3), activation="relu", padding="valid"),
+            #BatchNormalization(),
+            #MaxPooling2D(2,2),
 
             Flatten(),
             Dense(256, activation="relu"),
@@ -37,7 +38,11 @@ class moses_model:
         return model
     
     def load(self, weights_path="model.pth"):
-        self.model.load_weights(weights_path)
+        import os
+        temp_path = weights_path.replace(".pth", ".weights.h5")
+        os.rename(weights_path, temp_path)
+        self.model.load_weights(temp_path)
+        os.rename(temp_path, weights_path)
 
     def predict(self, images):
         images = np.array(images).astype("float32")
