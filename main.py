@@ -56,7 +56,7 @@ model = classifier.model
 
 # (learning_rate=0.0001)
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),  # changed the rate
     loss="sparse_categorical_crossentropy",
     metrics=["accuracy"],
 )
@@ -76,7 +76,6 @@ datagen = ImageDataGenerator(
     horizontal_flip=True,
     zoom_range=0.15,
 )
-
 # learning rate adjustment
 reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6)
 

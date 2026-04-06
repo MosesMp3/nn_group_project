@@ -23,17 +23,21 @@ class moses_model:
                 BatchNormalization(),
                 MaxPooling2D(2, 2),
                 Dropout(0.25),
+                # Block 2
                 Conv2D(128, (3, 3), activation="relu", padding="same"),
                 BatchNormalization(),
                 MaxPooling2D(2, 2),
                 Dropout(0.3),
+                # Block 3
                 Conv2D(256, (3, 3), activation="relu", padding="same"),
                 BatchNormalization(),
                 MaxPooling2D(2, 2),
                 Dropout(0.35),
-                # Conv2D(512, (3,3), activation="relu", padding="valid"),
-                # BatchNormalization(),
-                # MaxPooling2D(2,2),
+                # Block 4
+                Conv2D(512, (3, 3), activation="relu", padding="same"),
+                BatchNormalization(),
+                Dropout(0.4),
+                # Classification head
                 GlobalAveragePooling2D(),
                 Dense(128, activation="relu"),
                 Dropout(0.5),
