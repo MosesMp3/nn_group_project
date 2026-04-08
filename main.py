@@ -25,7 +25,7 @@ def cosine_schedule(epoch, lr):
 
 
 submission_check = False  # change to true only when val pickle is changed
-from_scratch = False
+from_scratch = True
 
 lr = 0.001 if from_scratch else 0.0001
 # if using classifier move learning rate from 0.001 which is for scratch to 0.0001
@@ -74,7 +74,8 @@ classifier = moses_model()
 model = classifier.model
 
 # add back in when it works, remove when restarting
-classifier.load("model.pth")
+if not from_scratch:
+    classifier.load("model.pth")
 
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=lr),  # changed the rate
@@ -117,7 +118,7 @@ if not submission_check:
         datagen.flow(X_train, y_train, batch_size=64),
         validation_data=(X_val, y_val),
         epochs=200,
-        callbacks=[early_stop, cosine_lr, checkpoint],
+        callbacks=[cosine_lr, checkpoint],
     )
 
 model.load_weights("best_model.weights.h5")
@@ -130,8 +131,8 @@ os.rename("model.weights.h5", "model.pth")
 
 classifier = moses_model()
 
-if not from_scratch:
-    classifier.load("model.pth")
+
+classifier.load("model.pth")
 
 predictions = classifier.predict(val_data["images"])
 
