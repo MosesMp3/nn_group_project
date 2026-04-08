@@ -25,7 +25,9 @@ def cosine_schedule(epoch, lr):
 
 
 submission_check = False  # change to true only when val pickle is changed
-lr = 0.0001
+from_scratch = False
+
+lr = 0.001 if from_scratch else 0.0001
 # if using classifier move learning rate from 0.001 which is for scratch to 0.0001
 
 SEED = 42
@@ -127,7 +129,9 @@ os.rename("model.weights.h5", "model.pth")
 
 
 classifier = moses_model()
-classifier.load("model.pth")
+
+if not from_scratch:
+    classifier.load("model.pth")
 
 predictions = classifier.predict(val_data["images"])
 
