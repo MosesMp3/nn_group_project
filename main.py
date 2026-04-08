@@ -20,6 +20,14 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 import math
 
 
+def cosine_schedule(epoch, lr):
+    return 0.0001 * 0.5 * (1 + math.cos(math.pi * epoch / 200))
+
+
+submission_check = False  # change to true only when val pickle is changed
+lr = 0.0001
+# if using classifier move learning rate from 0.001 which is for scratch to 0.0001
+
 SEED = 42
 tf.random.set_seed(SEED)
 np.random.seed(SEED)
@@ -33,7 +41,7 @@ val_path = BASE_DIR / "data" / "val" / "validation-10_.pkl"
 with open(train_path, "rb") as f:
     train_data = pickle.load(f)
 
-with open(val_path, "rb") as f:
+with open(val_path, "rb") as f:  # we can change this to the file they give us
     val_data = pickle.load(f)
 
 X_train = np.array(train_data["images"]).astype("float32")
@@ -65,8 +73,7 @@ model = classifier.model
 
 # add back in when it works, remove when restarting
 classifier.load("model.pth")
-lr = 0.0001
-# if using classifier move learning rate from 0.001 which is for scratch to 0.0001
+
 model.compile(
     optimizer=tf.keras.optimizers.Adam(learning_rate=lr),  # changed the rate
     loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
@@ -91,13 +98,7 @@ datagen = ImageDataGenerator(
 
 
 # learning rate adjustment
-#
-def cosine_schedule(epoch, lr):
-    return lr * 0.5 * (1 + math.cos(math.pi * epoch / 200))
-
-
 cosine_lr = LearningRateScheduler(cosine_schedule)
-reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6)
 
 checkpoint = ModelCheckpoint(
     "best_model.weights.h5",
@@ -107,14 +108,15 @@ checkpoint = ModelCheckpoint(
 )
 
 
-# train
-datagen.fit(X_train)
-history = model.fit(
-    datagen.flow(X_train, y_train, batch_size=64),
-    validation_data=(X_val, y_val),
-    epochs=200,
-    callbacks=[early_stop, cosine_lr, checkpoint],
-)
+# train, if just getting the score we dont do this
+if not submission_check:
+    datagen.fit(X_train)
+    history = model.fit(
+        datagen.flow(X_train, y_train, batch_size=64),
+        validation_data=(X_val, y_val),
+        epochs=200,
+        callbacks=[early_stop, cosine_lr, checkpoint],
+    )
 
 model.load_weights("best_model.weights.h5")
 score = model.evaluate(X_val, y_val)
